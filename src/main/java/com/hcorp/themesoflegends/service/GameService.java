@@ -1,9 +1,6 @@
 package com.hcorp.themesoflegends.service;
 
-import com.hcorp.themesoflegends.dto.GameDto;
-import com.hcorp.themesoflegends.dto.MusicDto;
-import com.hcorp.themesoflegends.dto.PlayerDto;
-import com.hcorp.themesoflegends.dto.PlayerResponseDto;
+import com.hcorp.themesoflegends.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,45 +10,41 @@ import java.util.*;
 public class GameService {
 
     private final MusicService musicService;
-    //TODO MOCK BDD
-    private final List<GameDto> games;
+    private final UserService userService;
+    private final GameManager gameManager;
 
     @Autowired
-    public GameService(MusicService musicService) {
+    public GameService(MusicService musicService, UserService userService, GameManager gameManager) {
         this.musicService = musicService;
-        this.games = new ArrayList<>();
+        this.userService = userService;
+        this.gameManager = gameManager;
     }
 
-    public GameDto createNewGame(String player, int roundToPlay) {
-        GameDto game = GameDto.builder()
-                .gameId(UUID.randomUUID().toString())
-                .player(PlayerDto.builder()
-                        .name(player)
-                        .score(0)
-                        .combo(0)
-                        .mastery("")
-                        .build())
-                .roundToPlay(roundToPlay)
-                .round(0)
-                .musicPlayed(new ArrayList<>())
-                .build();
-        this.games.add(game);
-        return game;
-    }
-
-    public boolean deleteGame(String gameId) {
-        Optional<GameDto> optionalGame = this.findGame(gameId);
-        if (optionalGame.isPresent()) {
-            this.games.remove(optionalGame.get());
-            return true;
+    public GameDto createNewGame(String userUid, int roundToPlay) {
+        UserDto userDto = this.userService.findUserByUid(userUid);
+        if (userDto != null) {
+            GameDto game = GameDto.builder()
+                    .gameId(UUID.randomUUID().toString())
+                    .player(PlayerDto.builder()
+                            .name(userDto.getName())
+                            .uid(userDto.getUid())
+                            .score(0)
+                            .combo(0)
+                            .mastery("")
+                            .build())
+                    .roundToPlay(roundToPlay)
+                    .round(0)
+                    .musicPlayed(new ArrayList<>())
+                    .build();
+            this.gameManager.addGame(game);
+            return game;
         }
-        return false;
+        return null;
     }
 
     public MusicDto getRoundMusic(String gameId) {
-        Optional<GameDto> optionalGame = this.findGame(gameId);
-        if (optionalGame.isPresent()) {
-            GameDto game = optionalGame.get();
+        GameDto game = this.gameManager.getGame(gameId);
+        if (game != null) {
             MusicDto music;
             do {
                 music = musicService.getRandomMusic();
@@ -64,11 +57,9 @@ public class GameService {
     }
 
     public GameDto treatPlayerResponse(String gameId, PlayerResponseDto playerResponse) {
-        Optional<GameDto> optionalGame = this.findGame(gameId);
-        MusicDto musicDto = this.musicService.findMusic(playerResponse.getMusicId());
-        if (optionalGame.isPresent()) {
-            GameDto game = optionalGame.get();
-
+        GameDto game = this.gameManager.getGame(gameId);
+        MusicDto musicDto = this.musicService.findMusic(playerResponse.getMusicToken());
+        if (game != null) {
             //points management
             int pointCounter = 0;
             int comboCounter = 0;
@@ -104,37 +95,38 @@ public class GameService {
             //round management
             game.setRound(game.getRound() + 1);
             if (game.getRound() == game.getRoundToPlay()) {
-                game.setOver(true);
-
-                //mastery management
-                int maxPoint = this.getMaxScore(game.getRoundToPlay());
-                if (game.getPlayer().getScore() > maxPoint * 0.85) {
-                    game.getPlayer().setMastery("M7");
-                } else if (game.getPlayer().getScore() > maxPoint * 0.70) {
-                    game.getPlayer().setMastery("M6");
-                } else if (game.getPlayer().getScore() > maxPoint * 0.55) {
-                    game.getPlayer().setMastery("M5");
-                } else if (game.getPlayer().getScore() > maxPoint * 0.40) {
-                    game.getPlayer().setMastery("M4");
-                } else if (game.getPlayer().getScore() > maxPoint * 0.25) {
-                    game.getPlayer().setMastery("M3");
-                } else if (game.getPlayer().getScore() > maxPoint * 0.10) {
-                    game.getPlayer().setMastery("M2");
-                } else {
-                    game.getPlayer().setMastery("M1");
-                }
-
-                this.games.remove(game);
+                this.endGame(game);
             }
             return game;
         }
         return null;
     }
 
-    private Optional<GameDto> findGame(String gameId) {
-        return this.games.stream()
-                .filter(gameDto -> gameId.equals(gameDto.getGameId()))
-                .findFirst();
+    private void endGame(GameDto game) {
+        game.setOver(true);
+
+        //mastery management
+        int maxPoint = this.getMaxScore(game.getRoundToPlay());
+        if (game.getPlayer().getScore() > maxPoint * 0.85) {
+            game.getPlayer().setMastery("M7");
+        } else if (game.getPlayer().getScore() > maxPoint * 0.70) {
+            game.getPlayer().setMastery("M6");
+        } else if (game.getPlayer().getScore() > maxPoint * 0.55) {
+            game.getPlayer().setMastery("M5");
+        } else if (game.getPlayer().getScore() > maxPoint * 0.40) {
+            game.getPlayer().setMastery("M4");
+        } else if (game.getPlayer().getScore() > maxPoint * 0.25) {
+            game.getPlayer().setMastery("M3");
+        } else if (game.getPlayer().getScore() > maxPoint * 0.10) {
+            game.getPlayer().setMastery("M2");
+        } else {
+            game.getPlayer().setMastery("M1");
+        }
+        //user update management
+        this.userService.updateUser(game.getPlayer().getUid(), game.getPlayer().getScore(), game.getPlayer().getMastery(), game.getRoundToPlay());
+
+        //game repository management
+        this.gameManager.removeGame(game.getGameId());
     }
 
     private int getMaxScore(int roundToPlay) {

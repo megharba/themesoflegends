@@ -9,6 +9,7 @@ import lombok.Setter;
 @Builder
 public class PlayerDto {
     private String name;
+    private String uid;
     private int score;
     private int combo;
     private String mastery;

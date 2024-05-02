@@ -30,15 +30,15 @@ public class MusicService {
     }
 
     public MusicDto findMusic(String musicId) {
-        return this.musicRepository.findByUid(musicId).map(this::convertToDto).orElse(null);
+        return this.musicRepository.findByToken(musicId).map(this::convertToDto).orElse(null);
     }
 
     private MusicDto convertToDto(Music music) {
         return MusicDto.builder()
-                .id(music.getUid())
+                .token(music.getToken())
                 .name(music.getName())
-                .date(music.getDate())
-                .type(music.getType())
+                .date(music.getDate().getValue())
+                .type(music.getGenre().getValue())
                 .aliases(music.getAliases())
                 .build();
     }

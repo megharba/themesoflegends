@@ -18,13 +18,8 @@ public class GameController {
     }
 
     @PostMapping("/create")
-    public GameDto createGame(@RequestParam("playerName") String playerName, @RequestParam("roundToPlay") int roundToPlay) {
-        return this.gameService.createNewGame(playerName, roundToPlay);
-    }
-
-    @DeleteMapping("/delete")
-    public boolean createGame(@RequestParam("gameId") String gameId) {
-        return this.gameService.deleteGame(gameId);
+    public GameDto createGame(@RequestParam("userUid") String userUid, @RequestParam("roundToPlay") int roundToPlay) {
+        return this.gameService.createNewGame(userUid, roundToPlay);
     }
 
     @GetMapping("/play-round")

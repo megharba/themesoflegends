@@ -7,14 +7,15 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter
 @Setter
-@AllArgsConstructor
+@Getter
 @Builder
-public class MusicDto {
-    private String token;
+@AllArgsConstructor
+public class UserDto {
+    private Long id;
     private String name;
-    private String date;
-    private String type;
-    private List<String> aliases;
+    private String uid;
+    private Long gamePlayed;
+    private List<HighScoreDto> highScore;
+    private Long totalScore;
 }

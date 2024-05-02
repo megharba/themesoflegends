@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name="music")
+@Table(name = "t_musique")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,22 +17,29 @@ import java.util.List;
 public class Music {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_musique")
     private Long id;
 
-    @Column
-    private String uid;
+    @Column(name = "m_token")
+    private String token;
 
-    @Column
+    @Column(name = "m_nom_musique")
     private String name;
 
-    @Column
-    private String date;
+    @ManyToOne
+    @JoinColumn(name = "id_genre_musique")
+    private MusicGenre genre;
 
-    @Column
-    private String type;
+    @ManyToOne
+    @JoinColumn(name = "id_date_musique")
+    private MusicDate date;
 
-    @Column
+    @Column(name = "m_url")
+    private String url;
+
     @ElementCollection
+    @CollectionTable(name = "t_alias", joinColumns = @JoinColumn(name = "id_musique"))
+    @Column(name = "a_alias")
     private List<String> aliases;
 
 }

@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class PlayerResponseDto {
-    private String musicId;
+    private String musicToken;
     private String proposition;
     private String type;
     private String date;
