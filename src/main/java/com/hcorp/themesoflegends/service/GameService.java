@@ -65,26 +65,25 @@ public class GameService {
 
     public GameDto treatPlayerResponse(String gameId, PlayerResponseDto playerResponse) {
         Optional<GameDto> optionalGame = this.findGame(gameId);
-        Optional<MusicDto> optionalMusic = this.musicService.findMusic(playerResponse.getMusicId());
-        if (optionalGame.isPresent() && optionalMusic.isPresent()) {
+        MusicDto musicDto = this.musicService.findMusic(playerResponse.getMusicId());
+        if (optionalGame.isPresent()) {
             GameDto game = optionalGame.get();
-            MusicDto music = optionalMusic.get();
 
             //points management
             int pointCounter = 0;
             int comboCounter = 0;
-            if (playerResponse.getDate().equals(music.getDate())) {
+            if (playerResponse.getDate().equals(musicDto.getDate())) {
                 pointCounter += 50;
                 comboCounter += 1;
             }
-            if (playerResponse.getType().equals(music.getType())) {
+            if (playerResponse.getType().equals(musicDto.getType())) {
                 pointCounter += 100;
                 comboCounter += 1;
             }
-            if (playerResponse.getProposition().toLowerCase().equals(music.getName())) {
+            if (playerResponse.getProposition().toLowerCase().equals(musicDto.getName())) {
                 pointCounter += 150;
                 comboCounter += 1;
-            } else if (music.getAliases().contains(playerResponse.getProposition().toLowerCase())) {
+            } else if (musicDto.getAliases().contains(playerResponse.getProposition().toLowerCase())) {
                 pointCounter += 100;
             }
 

@@ -2,32 +2,44 @@ package com.hcorp.themesoflegends.service;
 
 
 import com.hcorp.themesoflegends.dto.MusicDto;
+import com.hcorp.themesoflegends.entity.Music;
+import com.hcorp.themesoflegends.repositopry.MusicRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MusicService {
-    private final List<MusicDto> musics;
+    private final MusicRepository musicRepository;
 
-    public MusicService() {
-        //TODO MOCK BDD
-        MusicStorageService musicStorageService = new MusicStorageService();
-        this.musics = musicStorageService.getMusics();
+    @Autowired
+    public MusicService(MusicRepository musicRepository) {
+        this.musicRepository = musicRepository;
     }
 
     public List<MusicDto> getAllMusics() {
-        return this.musics;
+        return this.musicRepository.findAll().stream()
+                .map(this::convertToDto)
+                .toList();
     }
 
     public MusicDto getRandomMusic() {
-        return this.musics.get((int)(Math.random() * this.musics.size()));
+        List<Music> musics = this.musicRepository.findAll();
+        return this.convertToDto(musics.get((int) (Math.random() * musics.size())));
     }
 
-    public Optional<MusicDto> findMusic(String musicId) {
-        return this.musics.stream()
-                .filter(gameDto -> musicId.equals(gameDto.getId()))
-                .findFirst();
+    public MusicDto findMusic(String musicId) {
+        return this.musicRepository.findByUid(musicId).map(this::convertToDto).orElse(null);
+    }
+
+    private MusicDto convertToDto(Music music) {
+        return MusicDto.builder()
+                .id(music.getUid())
+                .name(music.getName())
+                .date(music.getDate())
+                .type(music.getType())
+                .aliases(music.getAliases())
+                .build();
     }
 }
