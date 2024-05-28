@@ -71,6 +71,8 @@ public class UserService {
                 .id(user.getId())
                 .name(user.getName())
                 .uid(user.getUid())
+                .avatarToken(user.getAvatarToken())
+                .email(user.getEmail())
                 .gamePlayed(user.getGamePlayed())
                 .highScore(user.getHighScore().stream()
                         .map(this.highScoreService::convertToDto)

@@ -24,6 +24,12 @@ public class User {
     @Column(name = "u_uid_utilisateur")
     private String uid;
 
+    @Column(name = "u_email")
+    private String email;
+
+    @Column(name = "u_avatar_token")
+    private String avatarToken;
+
     @Column(name = "u_mdp_utilisateur")
     private String password;
 

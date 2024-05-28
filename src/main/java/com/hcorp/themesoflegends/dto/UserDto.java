@@ -15,6 +15,8 @@ public class UserDto {
     private Long id;
     private String name;
     private String uid;
+    private String email;
+    private String avatarToken;
     private Long gamePlayed;
     private List<HighScoreDto> highScore;
     private Long totalScore;
