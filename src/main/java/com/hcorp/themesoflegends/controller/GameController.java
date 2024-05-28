@@ -22,6 +22,11 @@ public class GameController {
         return this.gameService.createNewGame(userUid, roundToPlay);
     }
 
+    @PostMapping("/delete")
+    public void deleteGame(@RequestParam("gameId") String gameId) {
+        this.gameService.deleteGame(gameId);
+    }
+
     @GetMapping("/play-round")
     public MusicDto getRoundMusic(@RequestParam("gameId") String gameId) {
         return this.gameService.getRoundMusic(gameId);

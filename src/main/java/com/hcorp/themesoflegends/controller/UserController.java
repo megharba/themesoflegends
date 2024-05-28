@@ -3,10 +3,7 @@ package com.hcorp.themesoflegends.controller;
 import com.hcorp.themesoflegends.dto.UserDto;
 import com.hcorp.themesoflegends.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -19,8 +16,8 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public UserDto createUser(@RequestParam("name") String userName, @RequestParam("password") String userPassword) {
-        return this.userService.createUser(userName, userPassword);
+    public UserDto createUser(@RequestParam("name") String userName, @RequestParam("email") String userEmail, @RequestParam("password") String userPassword) {
+        return this.userService.createUser(userName, userEmail, userPassword);
     }
 
     @PostMapping("/connect")

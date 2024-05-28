@@ -42,6 +42,10 @@ public class GameService {
         return null;
     }
 
+    public void deleteGame(String gameId) {
+        this.gameManager.removeGame(gameId);
+    }
+
     public MusicDto getRoundMusic(String gameId) {
         GameDto game = this.gameManager.getGame(gameId);
         if (game != null) {
@@ -123,7 +127,7 @@ public class GameService {
             game.getPlayer().setMastery("M1");
         }
         //user update management
-        this.userService.updateUser(game.getPlayer().getUid(), game.getPlayer().getScore(), game.getPlayer().getMastery(), game.getRoundToPlay());
+        this.userService.updateScore(game.getPlayer().getUid(), game.getPlayer().getScore(), game.getPlayer().getMastery(), game.getRoundToPlay());
 
         //game repository management
         this.gameManager.removeGame(game.getGameId());

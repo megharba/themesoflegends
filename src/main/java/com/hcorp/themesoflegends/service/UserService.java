@@ -22,11 +22,13 @@ public class UserService {
         this.highScoreService = highScoreService;
     }
 
-    public UserDto createUser(String userName, String userPassword) {
+    public UserDto createUser(String userName, String email, String userPassword) {
         if (this.userRepository.findByName(userName).isEmpty()) {
             User newUser = User.builder()
                     .name(userName)
                     .uid(UUID.randomUUID().toString())
+                    .email(email)
+                    .avatarToken("default")
                     .password(userPassword)
                     .gamePlayed(0L)
                     .totalScore(0L)
@@ -51,6 +53,7 @@ public class UserService {
     }
 
     public void updateUser(String userUid, int score, String mastery, int roundPlayed) {
+    public void updateScore(String userUid, int score, String mastery, int roundPlayed) {
         Optional<User> optionalUser = this.userRepository.findByUid(userUid);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
