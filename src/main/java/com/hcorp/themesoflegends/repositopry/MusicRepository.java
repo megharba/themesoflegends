@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 @RepositoryRestResource(exported = false)
 public interface MusicRepository extends JpaRepository<Music, Long> {
-    Optional<Music> findByToken(String uid);
+    Optional<Music> findByToken(String token);
 }

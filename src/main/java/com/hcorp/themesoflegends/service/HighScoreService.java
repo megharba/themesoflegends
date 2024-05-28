@@ -1,6 +1,7 @@
 package com.hcorp.themesoflegends.service;
 
 import com.hcorp.themesoflegends.dto.HighScoreDto;
+import com.hcorp.themesoflegends.dto.RankHighScoreDto;
 import com.hcorp.themesoflegends.entity.HighScore;
 import com.hcorp.themesoflegends.entity.User;
 import com.hcorp.themesoflegends.repositopry.HighScoreRepository;
@@ -45,11 +46,25 @@ public class HighScoreService {
         return newHighScores;
     }
 
+    public List<RankHighScoreDto> getRankHighScore(int round) {
+        return this.highScoreRepository.findAllByRoundNumberOrderByHighScoreValue((long) round).stream()
+                .limit(50)
+                .map(this::convertToToRankDto)
+                .toList();
+    }
+
     public HighScoreDto convertToDto(HighScore highScore) {
         return HighScoreDto.builder()
                 .roundNumber(highScore.getRoundNumber())
                 .highScoreValue(highScore.getHighScoreValue())
                 .mastery(highScore.getMastery())
+                .build();
+    }
+
+    public RankHighScoreDto convertToToRankDto(HighScore highScore) {
+        return RankHighScoreDto.builder()
+                .userName(highScore.getUser().getName())
+                .highScore(this.convertToDto(highScore))
                 .build();
     }
 }

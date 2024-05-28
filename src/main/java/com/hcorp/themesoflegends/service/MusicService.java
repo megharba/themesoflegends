@@ -29,8 +29,8 @@ public class MusicService {
         return this.convertToDto(musics.get((int) (Math.random() * musics.size())));
     }
 
-    public MusicDto findMusic(String musicId) {
-        return this.musicRepository.findByToken(musicId).map(this::convertToDto).orElse(null);
+    public MusicDto findMusic(String musicToken) {
+        return this.musicRepository.findByToken(musicToken).map(this::convertToDto).orElse(null);
     }
 
     private MusicDto convertToDto(Music music) {
