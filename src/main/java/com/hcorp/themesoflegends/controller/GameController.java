@@ -22,7 +22,7 @@ public class GameController {
         return this.gameService.createNewGame(userUid, roundToPlay);
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public void deleteGame(@RequestParam("gameId") String gameId) {
         this.gameService.deleteGame(gameId);
     }

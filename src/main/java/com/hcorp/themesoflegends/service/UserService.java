@@ -52,7 +52,26 @@ public class UserService {
         return user.map(this::convertToDto).orElse(null);
     }
 
-    public void updateUser(String userUid, int score, String mastery, int roundPlayed) {
+    public UserDto updateAvatar(String userUid, String newAvatar) {
+        Optional<User> optionalUser = this.userRepository.findByUid(userUid);
+        if(optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setAvatarToken(newAvatar);
+            return this.convertToDto(this.userRepository.save(user));
+        }
+        return null;
+    }
+
+    public UserDto updatePassword(String userUid, String newPassword) {
+        Optional<User> optionalUser = this.userRepository.findByUid(userUid);
+        if(optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setPassword(newPassword);
+            return this.convertToDto(this.userRepository.save(user));
+        }
+        return null;
+    }
+
     public void updateScore(String userUid, int score, String mastery, int roundPlayed) {
         Optional<User> optionalUser = this.userRepository.findByUid(userUid);
         if (optionalUser.isPresent()) {

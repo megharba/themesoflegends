@@ -20,6 +20,16 @@ public class UserController {
         return this.userService.createUser(userName, userEmail, userPassword);
     }
 
+    @PutMapping("/change-avatar")
+    public UserDto updateAvatar(@RequestParam("uid") String userUid, @RequestParam("avatar") String newAvatar) {
+        return this.userService.updateAvatar(userUid, newAvatar);
+    }
+
+    @PutMapping("/change-password")
+    public UserDto updatePassword(@RequestParam("uid") String userUid, @RequestParam("password") String newPassword) {
+        return this.userService.updatePassword(userUid, newPassword);
+    }
+
     @PostMapping("/connect")
     public UserDto connectUser(@RequestParam("name") String userName, @RequestParam("password") String userPassword) {
         return this.userService.connectUser(userName, userPassword);
