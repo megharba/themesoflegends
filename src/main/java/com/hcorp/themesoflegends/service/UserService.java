@@ -1,12 +1,17 @@
 package com.hcorp.themesoflegends.service;
 
+import com.hcorp.themesoflegends.dto.AvatarDto;
 import com.hcorp.themesoflegends.dto.UserDto;
+import com.hcorp.themesoflegends.entity.Avatar;
 import com.hcorp.themesoflegends.entity.User;
+import com.hcorp.themesoflegends.entity.UserAvatar;
 import com.hcorp.themesoflegends.repositopry.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,11 +20,18 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
     private final HighScoreService highScoreService;
+    private final AvatarService avatarService;
+    private final UserAvatarService userAvatarService;
 
     @Autowired
-    public UserService(UserRepository userRepository, HighScoreService highScoreService) {
+    public UserService(UserRepository userRepository,
+                       HighScoreService highScoreService,
+                       AvatarService avatarService,
+                       UserAvatarService userAvatarService) {
         this.userRepository = userRepository;
         this.highScoreService = highScoreService;
+        this.avatarService = avatarService;
+        this.userAvatarService = userAvatarService;
     }
 
     public UserDto createUser(String userName, String email, String userPassword) {
@@ -28,13 +40,23 @@ public class UserService {
                     .name(userName)
                     .uid(UUID.randomUUID().toString())
                     .email(email)
-                    .avatarToken("default")
                     .password(userPassword)
                     .gamePlayed(0L)
                     .totalScore(0L)
                     .build();
+
             newUser.setHighScore(this.highScoreService.createHighScore(newUser));
-            return this.convertToDto(this.userRepository.save(newUser));
+            newUser = this.userRepository.save(newUser);
+
+            for (Avatar avatar : avatarService.getAllAvatars()) {
+                UserAvatar userAvatar = UserAvatar.builder()
+                        .user(newUser)
+                        .avatar(avatar)
+                        .isSelectable(avatar.getToken().equals("default"))
+                        .isSelected(avatar.getToken().equals("default"))
+                        .build();
+                userAvatarService.createUserAvatar(userAvatar);
+            }
         }
         return null;
     }
@@ -52,19 +74,41 @@ public class UserService {
         return user.map(this::convertToDto).orElse(null);
     }
 
-    public UserDto updateAvatar(String userUid, String newAvatar) {
+    public List<AvatarDto> updateAvatar(String userUid, Long avatarId) {
         Optional<User> optionalUser = this.userRepository.findByUid(userUid);
-        if(optionalUser.isPresent()) {
+        if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            user.setAvatarToken(newAvatar);
-            return this.convertToDto(this.userRepository.save(user));
+            UserAvatar newUserAvatar = this.userAvatarService.findAvatarByUserIdAndAvatarId(user.getId(), avatarId);
+            if (newUserAvatar.isSelectable()) {
+                UserAvatar previousUserAvatar = this.userAvatarService.findSelectedAvatarByUserId(user.getId());
+                if (previousUserAvatar != null) {
+                    previousUserAvatar.setSelected(false);
+                    this.userAvatarService.updateUserAvatar(previousUserAvatar);
+                }
+                newUserAvatar.setSelected(true);
+                this.userAvatarService.updateUserAvatar(newUserAvatar);
+            }
+            return this.getUserAvatars(userUid);
         }
-        return null;
+        return new ArrayList<>();
+    }
+
+    public List<AvatarDto> buyAvatar(String userUid, Long avatarId) {
+        Optional<User> optionalUser = this.userRepository.findByUid(userUid);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            UserAvatar newUserAvatar = this.userAvatarService.findAvatarByUserIdAndAvatarId(user.getId(), avatarId);
+            if (!newUserAvatar.isSelectable()) {
+                newUserAvatar.setSelectable(true);
+                this.userAvatarService.updateUserAvatar(newUserAvatar);
+            }
+        }
+        return this.getUserAvatars(userUid);
     }
 
     public UserDto updatePassword(String userUid, String newPassword) {
         Optional<User> optionalUser = this.userRepository.findByUid(userUid);
-        if(optionalUser.isPresent()) {
+        if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.setPassword(newPassword);
             return this.convertToDto(this.userRepository.save(user));
@@ -88,12 +132,21 @@ public class UserService {
         }
     }
 
+    public List<AvatarDto> getUserAvatars(String userUid) {
+        Optional<User> optionalUser = this.userRepository.findByUid(userUid);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            return this.userAvatarService.findAvatarsByUserId(user.getId());
+        }
+        return new ArrayList<>();
+    }
+
     private UserDto convertToDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .uid(user.getUid())
-                .avatarToken(user.getAvatarToken())
+                .avatarToken(this.userAvatarService.findSelectedAvatarByUserId(user.getId()).getAvatar().getToken())
                 .email(user.getEmail())
                 .gamePlayed(user.getGamePlayed())
                 .highScore(user.getHighScore().stream()
