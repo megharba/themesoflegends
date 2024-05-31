@@ -18,4 +18,7 @@ public class Avatar {
 
     @Column(name = "a_token")
     private String token;
+
+    @Column(name = "a_prix")
+    private Long price;
 }

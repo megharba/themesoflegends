@@ -98,8 +98,10 @@ public class UserService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             UserAvatar newUserAvatar = this.userAvatarService.findAvatarByUserIdAndAvatarId(user.getId(), avatarId);
-            if (!newUserAvatar.isSelectable()) {
+            if (!newUserAvatar.isSelectable() && user.getTotalScore() >= newUserAvatar.getAvatar().getPrice()) {
                 newUserAvatar.setSelectable(true);
+                user.setTotalScore(user.getTotalScore() - newUserAvatar.getAvatar().getPrice());
+                this.userRepository.save(user);
                 this.userAvatarService.updateUserAvatar(newUserAvatar);
             }
         }
