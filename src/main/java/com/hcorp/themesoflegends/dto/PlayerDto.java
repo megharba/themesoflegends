@@ -10,6 +10,7 @@ import lombok.Setter;
 public class PlayerDto {
     private String name;
     private String uid;
+    private String avatarToken;
     private int score;
     private int combo;
     private String mastery;

@@ -43,6 +43,11 @@ public class UserController {
         return this.userService.connectUser(userName, userPassword);
     }
 
+    @GetMapping("/get")
+    public UserDto getUser(@RequestParam("uid") String uid) {
+        return this.userService.getUser(uid);
+    }
+
     @GetMapping("/avatars")
     public List<AvatarDto> getUserAvatars(@RequestParam("uid") String userUid) {
         return this.userService.getUserAvatars(userUid);

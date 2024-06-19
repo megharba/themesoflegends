@@ -69,6 +69,11 @@ public class UserService {
         return null;
     }
 
+    public UserDto getUser(String uid) {
+        Optional<User> user = this.userRepository.findByUid(uid);
+        return user.map(this::convertToDto).orElse(null);
+    }
+
     public UserDto findUserByUid(String userUid) {
         Optional<User> user = this.userRepository.findByUid(userUid);
         return user.map(this::convertToDto).orElse(null);
