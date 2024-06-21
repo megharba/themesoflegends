@@ -44,6 +44,7 @@ public class UserAvatarService {
         return AvatarDto.builder()
                 .id(userAvatar.getAvatar().getId())
                 .token(userAvatar.getAvatar().getToken())
+                .price(userAvatar.getAvatar().getPrice())
                 .isSelectable(userAvatar.isSelectable())
                 .isSelected(userAvatar.isSelected())
                 .build();

@@ -52,8 +52,8 @@ public class UserService {
                 UserAvatar userAvatar = UserAvatar.builder()
                         .user(newUser)
                         .avatar(avatar)
-                        .isSelectable(avatar.getToken().equals("default"))
-                        .isSelected(avatar.getToken().equals("default"))
+                        .isSelectable(avatar.getToken().equals("Globouille"))
+                        .isSelected(avatar.getToken().equals("Globouille"))
                         .build();
                 userAvatarService.createUserAvatar(userAvatar);
             }
