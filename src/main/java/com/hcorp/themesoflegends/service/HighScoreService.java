@@ -49,6 +49,7 @@ public class HighScoreService {
     public List<RankHighScoreDto> getRankHighScore(int round) {
         return this.highScoreRepository.findAllByRoundNumberOrderByHighScoreValue((long) round).stream()
                 .filter(highScore -> highScore.getHighScoreValue() > 0)
+                .sorted((hs1, hs2) -> Long.compare(hs2.getHighScoreValue(), hs1.getHighScoreValue()))
                 .limit(50)
                 .map(this::convertToToRankDto)
                 .toList();
