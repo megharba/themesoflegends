@@ -65,6 +65,7 @@ public class HighScoreService {
     public RankHighScoreDto convertToToRankDto(HighScore highScore) {
         return RankHighScoreDto.builder()
                 .userName(highScore.getUser().getName())
+                .uid(highScore.getUser().getUid())
                 .highScore(this.convertToDto(highScore))
                 .build();
     }

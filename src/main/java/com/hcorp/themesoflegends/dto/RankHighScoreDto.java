@@ -11,5 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RankHighScoreDto {
     String userName;
+    String uid;
     HighScoreDto highScore;
 }
